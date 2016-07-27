@@ -57,16 +57,6 @@ class ArchetypeManagerTest {
    }
 
    /**
-    * Test method for {@link com.cabolabs.openehr.archetypes.ArchetypeManager#ArchetypeManager(java.lang.String)}.
-    */
-   @Test
-   public void testArchetypeManager()
-   {
-      //def loader = ArchetypeManager.getInstance(path)
-      //def archetype = loader.getArchetype("openEHR-EHR-INSTRUCTION.test_ordenes.v1")
-   }
-
-   /**
     * Test method for {@link com.cabolabs.openehr.archetypes.ArchetypeManager#getInstance(java.lang.String)}.
     */
    @Test
@@ -96,39 +86,55 @@ class ArchetypeManagerTest {
    {
       def loader = ArchetypeManager.getInstance(path)
       loader.loadAll()
+      
+      // Obtiene un arquetipo por id
       def arch = loader.getArchetype("openEHR-EHR-OBSERVATION.blood_pressure.v1")
+      
+      
       assert arch.archetypeId.value == "openEHR-EHR-OBSERVATION.blood_pressure.v1"
-      println arch.definition.getClass().getSimpleName()
-      /*
-      arch.physicalPaths().each {
-         println it
+      assert arch.definition.getClass().getSimpleName() == "CComplexObject" // Clase del modelo de arquetipos
+      
+      
+      
+      // Muestra todas las paths del arquetipo y a que tipo del modelo de informacion corresponden
+      arch.physicalPaths().sort().each { path ->
+         println path +" ("+ arch.node(path).rmTypeName +")"
       }
-      */
       
       
-      // sistolica
-      println arch.node('/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value').getClass().getSimpleName()
+      // operaciones sobre nodos del arquetipo
+      // restriccion (CDvQuantity) sobre presion sistolica (DvQuantity)
+      assert arch.node('/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value').getClass().getSimpleName() == "CDvQuantity"
       
       assert arch.node('/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value').path() == '/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value'
       
       def cdvquantity = arch.node('/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value')
-      def listItems = cdvquantity.getList() // lista de restricciones
-      listItems.each { item ->
-         println item.units // String
-         println item.magnitude // Interval<Double>
-         println item.magnitude.lower
-         println item.magnitude.upper
-      }
+      def constraintList = cdvquantity.getList() // lista de restricciones
       
+      assert constraintList.size() == 1 // hay una sola restriccion
+      
+      def constraint = constraintList[0]
+
+      // datos de la restriccion: unidades y rango valido para la magnitud
+      assert constraint.units == "mm[Hg]"
+      assert constraint.magnitude.getClass().getSimpleName() == "Interval"
+      assert constraint.magnitude.lower == 0.0d
+      assert constraint.magnitude.upper == 1000.0d
+      
+      
+      
+      // validacion de un dato clinico contra una restriccion del arquetipo
       def datoUnits = 'mm[Hg]'
       def datoMagnitude = 134.0d
       
-      def valid = listItems.find { item ->
-         if (item.units == datoUnits &&item.magnitude.has(datoMagnitude)) return true
+      // se podria simplificar porque se sabe que el arquetipo tiene solo una restriccion en la lista
+      def valid = constraintList.find { item ->
+         // para la restriccion que tiene las mismas unidades que los datos
+         // verifica si la magnitud de los datos esta dentro del rango definido en la restriccion
+         if (item.units == datoUnits && item.magnitude.has(datoMagnitude)) return true
       } != null
       
-      if (valid) println "valid"
-      else println "invalid"
+      assert valid
       
       
       // diastolica
@@ -150,7 +156,29 @@ class ArchetypeManagerTest {
    @Test
    public void testGetArchetypes()
    {
-      //fail("Not yet implemented");
+      def loader = ArchetypeManager.getInstance(path)
+      loader.loadAll()
+      
+      // Obtiene un arquetipo por id
+      def archs = loader.getArchetypes("OBSERVATION", ".*")
+      
+      assert archs.size() == 7
+      
+      // arquetipos de observacion que hay en /resources
+      def existingArchetypes = [
+      "openEHR-EHR-OBSERVATION.blood_pressure.v1",
+      "openEHR-EHR-OBSERVATION.body_temperature.v1",
+      "openEHR-EHR-OBSERVATION.body_weight.v1",
+      "openEHR-EHR-OBSERVATION.height.v1",
+      "openEHR-EHR-OBSERVATION.pulse.v1",
+      "openEHR-EHR-OBSERVATION.respiration.v1",
+      "openEHR-EHR-OBSERVATION.test_all_datatypes.v1"
+      ]
+      
+      archs.each { arch ->
+      
+         assert existingArchetypes.contains ( arch.archetypeId.value )
+      }
    }
 
    /**
@@ -159,7 +187,25 @@ class ArchetypeManagerTest {
    @Test
    public void testGetArchetypeNode()
    {
-      //fail("Not yet implemented");
+      def loader = ArchetypeManager.getInstance(path)
+      loader.loadAll()
+      
+      // en lugar de pedirle un nodo al arquetipo se le puede pedir al ArchetypeManager
+      def cdvquantity = loader.getArchetypeNode('openEHR-EHR-OBSERVATION.blood_pressure.v1/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value')
+   
+      assert cdvquantity.getClass().getSimpleName() == "CDvQuantity"
+   
+      def constraintList = cdvquantity.getList() // lista de restricciones
+      
+      assert constraintList.size() == 1 // hay una sola restriccion
+      
+      def constraint = constraintList[0]
+
+      // datos de la restriccion: unidades y rango valido para la magnitud
+      assert constraint.units == "mm[Hg]"
+      assert constraint.magnitude.getClass().getSimpleName() == "Interval"
+      assert constraint.magnitude.lower == 0.0d
+      assert constraint.magnitude.upper == 1000.0d
    }
 
    /**
