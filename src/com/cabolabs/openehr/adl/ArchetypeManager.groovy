@@ -408,21 +408,33 @@ class ArchetypeManager {
    
    public Map getLoadedArchetypes()
    {
-       return this.cache
+      return this.cache
    }
    
    public Map getLastUse()
    {
-       return this.timestamps
+      return this.timestamps
    }
    
    @Synchronized
    public void unloadAll()
    {
-       this.cache.clear()
-       this.timestamps.clear()
+      this.cache.clear()
+      this.timestamps.clear()
    }
    
+   public String getText(String archetypeId, String lang, String code)
+   {
+      def arch = this.getArchetype(archetypeId)
+      def archTerm = arch.ontology.termDefinition(lang, code)
+      return archTerm?.text
+   }
+   public String getDescription(String archetypeId, String lang, String code)
+   {
+      def arch = this.getArchetype(archetypeId)
+      def archTerm = arch.ontology.termDefinition(lang, code)
+      return archTerm?.description
+   }
    
    /**
     * Busca ids de arquetipos que contengan el substring.

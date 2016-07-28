@@ -77,6 +77,40 @@ class ArchetypeManagerTest {
       assert loader.getArchetypes("composition", ".*").size() == 3 : "No se cargaron todos los arquetipos"
       assert loader.getArchetypes("observation", ".*").size() == 7 : "No se cargaron todos los arquetipos"
    }
+   
+   @Test
+   public void testGetText()
+   {
+      def loader = ArchetypeManager.getInstance(path)
+      loader.loadAll()
+      
+      // Todos estos casos de test son correctos
+      // los caracteres acentuados se escriben en unicode para evitar problemas de Java en la comparacion
+      // https://dtrinf.wordpress.com/2012/02/29/como-escribir-enes-n-y-acentos-en-java/
+      def testCases = [
+        ['openEHR-EHR-OBSERVATION.blood_pressure.v1', 'en', 'at0000', 'Blood Pressure'],
+        ['openEHR-EHR-OBSERVATION.blood_pressure.v1', 'en', 'at0004', 'Systolic'],
+        ['openEHR-EHR-OBSERVATION.blood_pressure.v1', 'en', 'at0005', 'Diastolic'],
+        ['openEHR-EHR-OBSERVATION.blood_pressure.v1', 'en', 'at0013', 'Cuff size'],
+        ['openEHR-EHR-OBSERVATION.blood_pressure.v1', 'es-ar', 'at0000', 'Presi\u00f3n Arterial'],
+        ['openEHR-EHR-OBSERVATION.blood_pressure.v1', 'es-ar', 'at0004', 'Sist\u00f3lica'],
+        ['openEHR-EHR-OBSERVATION.blood_pressure.v1', 'es-ar', 'at0005', 'Di\u00e1stole'],
+        ['openEHR-EHR-OBSERVATION.blood_pressure.v1', 'es-ar', 'at0013', 'Tama\u00f1o del manguito']
+      ]
+      
+      def text
+      testCases.each { testCase ->
+
+         text = loader.getText(testCase[0], testCase[1], testCase[2])
+         
+         assert text != null
+         
+         assert text == testCase[3]
+         
+         println text
+      }
+   }
+
 
    /**
     * Test method for {@link com.cabolabs.openehr.archetypes.ArchetypeManager#getArchetype(java.lang.String)}.
@@ -97,9 +131,11 @@ class ArchetypeManagerTest {
       
       
       // Muestra todas las paths del arquetipo y a que tipo del modelo de informacion corresponden
+      println ""
       arch.physicalPaths().sort().each { path ->
          println path +" ("+ arch.node(path).rmTypeName +")"
       }
+      println ""
       
       
       // operaciones sobre nodos del arquetipo
