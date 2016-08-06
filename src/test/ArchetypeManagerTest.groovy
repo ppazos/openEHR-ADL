@@ -74,8 +74,12 @@ class ArchetypeManagerTest {
    {
       def loader = ArchetypeManager.getInstance(path)
       loader.loadAll()
+      
+      
+      def observation_adl_files = new File(path + PS + "entry" + PS + "observation").listFiles().count { it.name ==~ /.*\.adl/ }
+      
       assert loader.getArchetypes("composition", ".*").size() == 3 : "No se cargaron todos los arquetipos"
-      assert loader.getArchetypes("observation", ".*").size() == 7 : "No se cargaron todos los arquetipos"
+      assert loader.getArchetypes("observation", ".*").size() == observation_adl_files : "No se cargaron todos los arquetipos"
    }
    
    @Test
@@ -198,7 +202,9 @@ class ArchetypeManagerTest {
       // Obtiene un arquetipo por id
       def archs = loader.getArchetypes("OBSERVATION", ".*")
       
-      assert archs.size() == 7
+      def observation_adl_files = new File(path + PS + "entry" + PS + "observation").listFiles().count { it.name ==~ /.*\.adl/ }
+      
+      assert archs.size() == observation_adl_files
       
       // arquetipos de observacion que hay en /resources
       def existingArchetypes = [
@@ -208,7 +214,8 @@ class ArchetypeManagerTest {
       "openEHR-EHR-OBSERVATION.height.v1",
       "openEHR-EHR-OBSERVATION.pulse.v1",
       "openEHR-EHR-OBSERVATION.respiration.v1",
-      "openEHR-EHR-OBSERVATION.test_all_datatypes.v1"
+      "openEHR-EHR-OBSERVATION.test_all_datatypes.v1",
+      "openEHR-EHR-OBSERVATION.test_servicios_terminologicos.v1"
       ]
       
       archs.each { arch ->

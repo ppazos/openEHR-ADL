@@ -1,0 +1,149 @@
+archetype (adl_version=1.4)
+	openEHR-EHR-OBSERVATION.test_servicios_terminologicos.v1
+
+concept
+	[at0000]	-- Test servicios terminologicos
+language
+	original_language = <[ISO_639-1::es]>
+description
+	original_author = <
+		["name"] = <"">
+	>
+	details = <
+		["es"] = <
+			language = <[ISO_639-1::es]>
+			purpose = <"Test servicios terminologicos">
+			use = <"Test servicios terminologicos">
+			misuse = <"">
+			copyright = <"">
+		>
+	>
+	lifecycle_state = <"0">
+	other_contributors = <>
+	other_details = <
+		["MD5-CAM-1.0.1"] = <"B4A1915B6AFF547E4D07555C5A490994">
+	>
+
+definition
+	OBSERVATION[at0000] matches {	-- Test servicios terminologicos
+		data matches {
+			HISTORY[at0001] matches {	-- Event Series
+				events cardinality matches {1..*; unordered} matches {
+					EVENT[at0002] occurrences matches {0..1} matches {	-- Cualquier evento
+						data matches {
+							ITEM_TREE[at0003] matches {	-- Arbol
+								items cardinality matches {0..*; unordered} matches {
+									ELEMENT[at0004] occurrences matches {0..1} matches {	-- Texto codificado solo constraint
+										value matches {
+											DV_CODED_TEXT matches {
+												defining_code matches {[ac0001]}		-- Nueva restriccion
+											}
+										}
+									}
+									ELEMENT[at0005] occurrences matches {0..1} matches {	-- Texto codificado constraint + terminologia
+										value matches {
+											DV_CODED_TEXT matches {
+												defining_code matches {[ac0002]}		-- Nueva restriccion
+											}
+										}
+									}
+									ELEMENT[at0006] occurrences matches {0..1} matches {	-- Texto codif lista de codigos
+										value matches {
+											DV_CODED_TEXT matches {
+												defining_code matches {
+													[local::
+													at0007, 	-- aaa
+													at0008]	-- bbb
+												}
+											}
+										}
+									}
+									ELEMENT[at0009] occurrences matches {0..*} matches {	-- Texto codif constraing + multiple
+										value matches {
+											DV_CODED_TEXT matches {
+												defining_code matches {[ac0003]}		-- Nueva restriccion
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+ontology
+	terminologies_available = <"ICD10_1998", ...>
+	term_definitions = <
+		["es"] = <
+			items = <
+				["at0000"] = <
+					text = <"Test servicios terminologicos">
+					description = <"unknown">
+				>
+				["at0001"] = <
+					text = <"Event Series">
+					description = <"@ internal @">
+				>
+				["at0002"] = <
+					text = <"Cualquier evento">
+					description = <"*">
+				>
+				["at0003"] = <
+					text = <"Arbol">
+					description = <"@ internal @">
+				>
+				["at0004"] = <
+					text = <"Texto codificado solo constraint">
+					description = <"*">
+				>
+				["at0005"] = <
+					text = <"Texto codificado constraint + terminologia">
+					description = <"*">
+				>
+				["at0006"] = <
+					text = <"Texto codif lista de codigos">
+					description = <"*">
+				>
+				["at0007"] = <
+					text = <"aaa">
+					description = <"daaaa">
+				>
+				["at0008"] = <
+					text = <"bbb">
+					description = <"dbbbb">
+				>
+				["at0009"] = <
+					text = <"Texto codif constraing + multiple">
+					description = <"*">
+				>
+			>
+		>
+	>
+	constraint_definitions = <
+		["es"] = <
+			items = <
+				["ac0001"] = <
+					text = <"Nueva restriccion">
+					description = <"*">
+				>
+				["ac0002"] = <
+					text = <"Nueva restriccion">
+					description = <"*">
+				>
+				["ac0003"] = <
+					text = <"Nueva restriccion">
+					description = <"*">
+				>
+			>
+		>
+	>
+	constraint_bindings = <
+		["ICD10_1998"] = <
+			items = <
+				["ac0002"] = <terminology:ICD10_1998?subset=XIX%20Trauma>
+			>
+		>
+	>

@@ -1,0 +1,1 @@
+java -cp "./lib/*;%GROOVY_HOME%/embeddable/groovy-all-2.4.3.jar;openEHR_ADL.jar" com.cabolabs.openehr.ui.FormGeneratorExample %1
