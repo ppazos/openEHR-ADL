@@ -6,53 +6,22 @@ import groovy.xml.MarkupBuilder
 import org.openehr.am.archetype.constraintmodel.ConstraintRef
 import org.openehr.am.openehrprofile.datatypes.text.CCodePhrase
 
-class FormGeneratorExample {
+class FormGeneratorWalkthrough {
 
    private static String PS = File.separator
    private static String path = "."+ PS +"resources"+ PS +"archetypes"
    private static List datavalues = ['DV_TEXT', 'DV_CODED_TEXT', 'DV_QUANTITY', 'DV_COUNT',
-                                     'DV_ORDINAL', 'DV_DATE', 'DV_DATE_TIME']
+                                     'DV_ORDINAL', 'DV_DATE', 'DV_DATE_TIME', 'DV_PROPORTION',
+                                     'DV_DURATION']
 
-   static void main(String[] args)
+   String generate(arch, locale)
    {
-      if (args.size() == 0 || args[0] == 'help')
-      {
-         println 'usage: uigen archetypeId'
-         System.exit(0)
-      }
-      
-      // TODO> args
-      def locale = "es"
-      
-      def archetypeId = args[0]
-      def loader = ArchetypeManager.getInstance(path)
-      loader.loadAll()
-      def arch
-
-      try
-      {
-         arch = loader.getArchetype( archetypeId )
-      }
-      catch (e)
-      {
-         println "Verify the archetypeId format"
-         System.exit(0)
-      }
-      
-      if (!arch)
-      {
-         println "Archetype $archetypeId doesn't exists"
-         System.exit(0)
-      }
-      
       def walk = new ArchetypeWalkthrough()
-      
       
       def writer = new StringWriter()
       def builder = new MarkupBuilder(writer)
       builder.setDoubleQuotes(true) // Use double quotes on attributes
 
-      
       
       // Destination html
       walk.memory['html'] = builder
@@ -105,27 +74,80 @@ class FormGeneratorExample {
                     
                        constraint.codeList.each { code ->
                        
-                          option(value:code, parchetype.ontology.termDefinition(locale, code).text)
+                          option(value:code, parchetype.ontology.termDefinition(locale, code)?.text)
                        }
                     }
                  }
-                 //if (constraint instanceof ConstraintRef) println constraint // TODO
+                 if (constraint instanceof ConstraintRef)
+                 {
+                    println constraint // TODO
+                    def term = parchetype.ontology.constraintDefinition(locale, constraint.reference)
+                    println term.text
+                    println term.description
+                    
+                    input(type:'text', name:node.path())
+                    i(class:'search', '')
+                 }
               break
               case 'DV_QUANTITY':
                  input(type:'text', name:node.path()+'/magnitude')
-                 input(type:'text', name:node.path()+'/units')
+                 
+                 select(name:node.path()+'/units') {
+                    
+                    node.list.units.each { u ->
+                    
+                       option(value:u, u)
+                    }
+                 }
               break
               case 'DV_COUNT':
                  input(type:'number', name:node.path())
               break
               case 'DV_ORDINAL':
-              
+                 
+                 // ordinal.value // int
+                 // ordinal.symbol // DvCodedText
+                 // ordinal.symbol.codeString
+                 // ordinal.symbol.terminologyId
+                 
+                 select(name:node.path()) {
+                    
+                    node.list.each { ord ->
+                    
+                       option(value:ord.value, this.arch.ontology.termDefinition(locale, ord.symbol.codeString).text)
+                    }
+                 }
               break
               case 'DV_DATE':
                  input(type:'date', name:node.path())
               break
               case 'DV_DATE_TIME':
                  input(type:'datetime-local', name:node.path())
+              break
+              case 'DV_BOOLEAN':
+                 input(type:'checkbox', name:node.path())
+              break
+              case 'DV_DURATION':
+                 label('D') {
+                   input(type:'number', name:node.path()+'/D', class:'small')
+                 }
+                 label('H') {
+                   input(type:'number', name:node.path()+'/H', class:'small')
+                 }
+                 label('M') {
+                   input(type:'number', name:node.path()+'/M', class:'small')
+                 }
+                 label('S') {
+                   input(type:'number', name:node.path()+'/S', class:'small')
+                 }
+              break
+              case 'DV_PROPORTION':
+                 label('numerator') {
+                   input(type:'number', name:node.path()+'/numerator', class:'small')
+                 }
+                 label('denominator') {
+                   input(type:'number', name:node.path()+'/denominator', class:'small')
+                 }
               break
               // TODO: generar campos para los DV_INTERVAL
            }
@@ -144,16 +166,15 @@ class FormGeneratorExample {
       walk.init(arch)
       
       builder.html {
-        head()
+        head() {
+          link(rel:"stylesheet", href:"style.css")
+        }
         body() {
+          h1(arch.archetypeId.value)
           walk.start()
         }
       }
       
-      //println "memory: "+ writer.toString()
-      
-      def f = new File( new java.text.SimpleDateFormat("yyyyMMddhhmmss'.html'").format(new Date()) )
-      f << writer.toString()
-      println "Generated: "+ f.path
+      return writer.toString()
    }
 }

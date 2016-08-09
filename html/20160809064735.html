@@ -1,0 +1,109 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>openEHR-EHR-OBSERVATION.test_all_datatypes.v1</h1>
+    <div class="OBSERVATION">
+      <div class="HISTORY">
+        <div class="POINT_EVENT">
+          <div class="ITEM_TREE">
+            <div class="ELEMENT">
+              <label>Free text</label>
+              <textarea name="/data[at0001]/events[at0002]/data[at0003]/items[at0004]/value"></textarea>
+            </div>
+            <div class="ELEMENT">
+              <label>Coded text</label>
+              <select name="/data[at0001]/events[at0002]/data[at0003]/items[at0005]/value">
+                <option value="at0007">a</option>
+                <option value="at0008">b</option>
+                <option value="at0009">c</option>
+              </select>
+            </div>
+            <div class="ELEMENT">
+              <label>Constrained text</label>
+              <input type="text" name="/data[at0001]/events[at0002]/data[at0003]/items[at0006]/value" />
+              <i class="search"></i>
+            </div>
+            <div class="ELEMENT">
+              <label>Quantity</label>
+              <input type="text" name="/data[at0001]/events[at0002]/data[at0003]/items[at0010]/value/magnitude" />
+              <select name="/data[at0001]/events[at0002]/data[at0003]/items[at0010]/value/units">
+                <option value="°C">°C</option>
+                <option value="°F">°F</option>
+              </select>
+            </div>
+            <div class="ELEMENT">
+              <label>Count</label>
+              <input type="number" name="/data[at0001]/events[at0002]/data[at0003]/items[at0011]/value" />
+            </div>
+            <div class="ELEMENT">
+              <label>Datetime</label>
+              <input type="datetime-local" name="/data[at0001]/events[at0002]/data[at0003]/items[at0012]/value" />
+            </div>
+            <div class="ELEMENT">
+              <label>Ordinal</label>
+              <select name="/data[at0001]/events[at0002]/data[at0003]/items[at0013]/value">
+                <option value="1">aa</option>
+                <option value="2">bb</option>
+                <option value="3">cc</option>
+              </select>
+            </div>
+            <div class="ELEMENT">
+              <label>Boolean</label>
+              <input type="checkbox" name="/data[at0001]/events[at0002]/data[at0003]/items[at0017]/value" />
+            </div>
+            <div class="ELEMENT">
+              <label>Duration</label>
+              <label>D
+                <input type="number" name="/data[at0001]/events[at0002]/data[at0003]/items[at0018]/value/D" class="small" />
+              </label>
+              <label>H
+                <input type="number" name="/data[at0001]/events[at0002]/data[at0003]/items[at0018]/value/H" class="small" />
+              </label>
+              <label>M
+                <input type="number" name="/data[at0001]/events[at0002]/data[at0003]/items[at0018]/value/M" class="small" />
+              </label>
+              <label>S
+                <input type="number" name="/data[at0001]/events[at0002]/data[at0003]/items[at0018]/value/S" class="small" />
+              </label>
+            </div>
+            <div class="ELEMENT">
+              <label>Integer interval</label>
+            </div>
+            <div class="ELEMENT">
+              <label>Quanitty interval</label>
+            </div>
+            <div class="ELEMENT">
+              <label>Datetime interval</label>
+            </div>
+            <div class="ELEMENT">
+              <label>Multimedia</label>
+            </div>
+            <div class="ELEMENT">
+              <label>EHR_URI</label>
+            </div>
+            <div class="ELEMENT">
+              <label>URI</label>
+            </div>
+            <div class="ELEMENT">
+              <label>Proportion</label>
+              <label>numerator
+                <input type="number" name="/data[at0001]/events[at0002]/data[at0003]/items[at0024]/value/numerator" class="small" />
+              </label>
+              <label>denominator
+                <input type="number" name="/data[at0001]/events[at0002]/data[at0003]/items[at0024]/value/denominator" class="small" />
+              </label>
+            </div>
+            <div class="ELEMENT">
+              <label>Identifier</label>
+            </div>
+            <div class="ELEMENT">
+              <label>Parsable</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
