@@ -344,25 +344,8 @@ public class ArchetypeWalkthrough {
    
    def wt(ArchetypeInternalRef c, Object parent, Archetype archetype)
    {
-      throw new Exception("wt ArchetypeInternalRef no implementado")
-      
-      // nodeId dice que es null para slot
-      //println "Slot>> " + c
-      
-      //println "InternalRef>> " + c.rmTypeName + " " + parent //archetype.archetypeId.value // + ' ' + c.nodeId // + ' ' + c.includes
-      
-      // FIXME: la path del InternalRef se debe sobreescribir con la path en el arquetipo plano y con los codeIds reescritos.
-      // data matches {
-      //   use_node ITEM_TREE /data[at0001]/events[at0006]/data[at0003]   -- /data[history]/events[any event]/data[blood pressure]
-
-      
-      /*
-      this.observers[EVENT_SLOT].each { actions ->
-         actions.each { action ->
-            action.execute([archetype:archetype, node:c, result:this.result, walk:this]) // result es in/out
-         }
-      }
-      */
+      def node = archetype.node( c.targetPath )
+      wt(node, c.parent, archetype)
    }
    
    // No hacen nada porque no tiene hijos que puedan ser slots, solo el CComplexObject puede tener hijos slots

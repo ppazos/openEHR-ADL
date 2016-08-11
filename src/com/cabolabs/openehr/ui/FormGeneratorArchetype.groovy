@@ -12,7 +12,7 @@ class FormGeneratorArchetype {
 
    String generate(arch, locale)
    {
-      println "generate " + arch.definition.rmTypeName +" "+ locale
+      //println "generate " + arch.definition.rmTypeName +" "+ locale
       this.arch = arch
       this.locale = locale
       
@@ -42,6 +42,7 @@ class FormGeneratorArchetype {
       
       if (o.rmTypeName == 'ELEMENT')
       {
+         // TODO: support ELEMENT.name constraint
          def valueObj = o.attributes.find { it.rmAttributeName == 'value' }.children[0]
          
          b.div(class:o.rmTypeName) {
@@ -59,7 +60,7 @@ class FormGeneratorArchetype {
                  {
                     //println constraint.codeList
                     
-                    select(name:valueObj.path()) {
+                    select(name:constraint.path()) {
                     
                        constraint.codeList.each { code ->
                        
@@ -69,7 +70,7 @@ class FormGeneratorArchetype {
                  }
                  if (constraint instanceof ConstraintRef)
                  {
-                    input(type:'text', name:valueObj.path())
+                    input(type:'text', name:constraint.path())
                     i(class:'search', '')
                  }
               break
@@ -146,7 +147,7 @@ class FormGeneratorArchetype {
    {
       a.children.each { o ->
       
-        println o.getClass()
+        //println o.getClass()
         process(o, b)
       }
    }
@@ -158,54 +159,25 @@ class FormGeneratorArchetype {
    // Handles DV_CODED_TEXT constraints that are for IM attributes that are not ELEMENT.value
    def process(CCodePhrase c, MarkupBuilder b)
    {
-      // TODO
-      println c
+      b.select(name:c.path()) {
+                    
+         c.codeList.each { code ->
+        
+            option(value:code, this.arch.ontology.termDefinition(locale, code)?.text)
+         }
+      }
    }
    def process(CPrimitiveObject p, MarkupBuilder b)
    {
+      // TODO:
       // Don't support po yet
-      println p // e.g. CDuration
+      println "This constraint is not supported yet: "+ p.class  // e.g. CDuration
    }
    
    def process(ArchetypeInternalRef o, MarkupBuilder b)
    {
-      // Don't support iref yet
-      println o
-      
-      // TODO get the node and process it
-      /*
-      class org.openehr.am.archetype.constraintmodel.ArchetypeInternalRef
-         org.openehr.am.archetype.constraintmodel.ArchetypeInternalRef@11b16[
-           targetPath=/data[at0001]/events[at0006]/state[at0007]
-           rmTypeName=ITEM_TREE
-           occurrences=org.openehr.rm.support.basic.Interval@9957eb[lower=1,lowerIncluded=true,upper=1,upperIncluded=true]
-           nodeID=<null>
-           parent=org.openehr.am.archetype.constraintmodel.CSingleAttribute@15b4535[
-           rmAttributeName=state
-           existence=REQUIRED
-           children=[org.openehr.am.archetype.constraintmodel.ArchetypeInternalRef@11b16[
-           targetPath=/data[at0001]/events[at0006]/state[at0007]
-           rmTypeName=ITEM_TREE
-           occurrences=org.openehr.rm.support.basic.Interval@9957eb[lower=1,lowerIncluded=true,upper=1,upperIncluded=true]
-        nodeID=<null>
-        parent=org.openehr.am.archetype.constraintmodel.CSingleAttribute@15b4535
-        anyAllowed=false
-        path=/data[at0001]/events[at1042]/state
-        hiddenOnForm=false
-        annotation=<null>
-      ]]
-        anyAllowed=false
-        path=/data[at0001]/events[at1042]/state
-        hiddenOnForm=false
-        annotation=<null>
-      ]
-        anyAllowed=false
-        path=/data[at0001]/events[at1042]/state
-        hiddenOnForm=false
-        annotation=<null>
-      ]
-
-      */
+      def node = this.arch.node( o.targetPath ) // process referenced node
+      process(node, b)
    }
    
    /*
