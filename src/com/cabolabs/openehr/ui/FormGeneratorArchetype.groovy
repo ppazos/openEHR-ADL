@@ -27,14 +27,17 @@ class FormGeneratorArchetype {
         }
         body() {
           h1(arch.archetypeId.value)
-          process(arch.definition, builder)
+          form(method:'POST') {
+            input(type:'hidden', name:'archetypeId', value:arch.archetypeId.value)
+            process(arch.definition, builder, null)
+          }
         }
       }
       
       return writer.toString()
    }
    
-   def process(CComplexObject o, MarkupBuilder b)
+   def process(CComplexObject o, MarkupBuilder b, ArchetypeInternalRef from_ref)
    {
       // TODO:
       // For instruction, generate the narrative
@@ -45,6 +48,19 @@ class FormGeneratorArchetype {
          // TODO: support ELEMENT.name constraint
          def valueObj = o.attributes.find { it.rmAttributeName == 'value' }.children[0]
          
+         // override path is used to support ARCHETYPE_REFS
+         def path = valueObj.path()
+         if (from_ref)
+         {
+            //println "current path " + path
+            //println "from target: " + from_ref.targetPath
+            //println "from path: " + from_ref.path()
+            
+            // Need to add the nodeId of the target because the ref path doesn't have it
+            path = path.replace(from_ref.targetPath, from_ref.path() +'['+ this.arch.node( from_ref.targetPath ).nodeId +']') // the parent of the current node is the ref not the referenced node
+            //println "result path "+ path
+         }
+         
          b.div(class:o.rmTypeName) {
          
            label( this.arch.ontology.termDefinition(locale, o.nodeID)?.text )
@@ -52,15 +68,17 @@ class FormGeneratorArchetype {
            switch (valueObj.rmTypeName)
            {
               case 'DV_TEXT':
-                 textarea(name:valueObj.path(), '')
+                 textarea(name:path, '')
               break
               case 'DV_CODED_TEXT':
                  def constraint = valueObj.attributes.find{ it.rmAttributeName == 'defining_code' }.children[0]
                  if (constraint instanceof CCodePhrase)
                  {
                     //println constraint.codeList
-                    
-                    select(name:constraint.path()) {
+                    def cpath = constraint.path()
+                    if (from_ref) cpath = cpath.replace(from_ref.targetPath, from_ref.path()) // the parent of the current node is the ref not the referenced node
+         
+                    select(name:cpath) {
                     
                        constraint.codeList.each { code ->
                        
@@ -70,14 +88,14 @@ class FormGeneratorArchetype {
                  }
                  if (constraint instanceof ConstraintRef)
                  {
-                    input(type:'text', name:constraint.path())
+                    input(type:'text', name:cpath)
                     i(class:'search', '')
                  }
               break
               case 'DV_QUANTITY':
-                 input(type:'text', name:valueObj.path()+'/magnitude')
+                 input(type:'text', name:path+'/magnitude')
                  
-                 select(name:valueObj.path()+'/units') {
+                 select(name:path+'/units') {
                     
                     valueObj.list.units.each { u ->
                     
@@ -86,10 +104,10 @@ class FormGeneratorArchetype {
                  }
               break
               case 'DV_COUNT':
-                 input(type:'number', name:valueObj.path())
+                 input(type:'number', name:path)
               break
               case 'DV_ORDINAL':
-                 select(name:valueObj.path()) {
+                 select(name:path) {
                     
                     valueObj.list.each { ord ->
                     
@@ -98,36 +116,37 @@ class FormGeneratorArchetype {
                  }
               break
               case 'DV_DATE':
-                 input(type:'date', name:valueObj.path())
+                 input(type:'date', name:path)
               break
               case 'DV_DATE_TIME':
-                 input(type:'datetime-local', name:valueObj.path())
+                 input(type:'datetime-local', name:path)
               break
               case 'DV_BOOLEAN':
-                 input(type:'checkbox', name:valueObj.path())
+                 input(type:'checkbox', name:path)
               break
               case 'DV_DURATION':
                  label('D') {
-                   input(type:'number', name:valueObj.path()+'/D', class:'small')
+                   input(type:'number', name:path+'/D', class:'small')
                  }
                  label('H') {
-                   input(type:'number', name:valueObj.path()+'/H', class:'small')
+                   input(type:'number', name:path+'/H', class:'small')
                  }
                  label('M') {
-                   input(type:'number', name:valueObj.path()+'/M', class:'small')
+                   input(type:'number', name:path+'/M', class:'small')
                  }
                  label('S') {
-                   input(type:'number', name:valueObj.path()+'/S', class:'small')
+                   input(type:'number', name:path+'/S', class:'small')
                  }
               break
               case 'DV_PROPORTION':
                  label('numerator') {
-                   input(type:'number', name:valueObj.path()+'/numerator', class:'small')
+                   input(type:'number', name:path+'/numerator', class:'small')
                  }
                  label('denominator') {
-                   input(type:'number', name:valueObj.path()+'/denominator', class:'small')
+                   input(type:'number', name:path+'/denominator', class:'small')
                  }
               break
+              // TODO: DV_IDENTIFIER
               // TODO: generar campos para los DV_INTERVAL
            }
          }
@@ -138,28 +157,31 @@ class FormGeneratorArchetype {
             
             label(this.arch.ontology.termDefinition(locale, o.nodeID)?.text)
             o.attributes.each { a ->
-               process(a, b)
+               process(a, b, from_ref)
             }
          }
       }
    }
-   def process(CAttribute a, MarkupBuilder b)
+   def process(CAttribute a, MarkupBuilder b, ArchetypeInternalRef from_ref)
    {
       a.children.each { o ->
       
         //println o.getClass()
-        process(o, b)
+        process(o, b, from_ref)
       }
    }
-   def process(ArchetypeSlot s, MarkupBuilder b)
+   def process(ArchetypeSlot s, MarkupBuilder b, ArchetypeInternalRef from_ref)
    {
       // Don't support slots yet
    }
    
    // Handles DV_CODED_TEXT constraints that are for IM attributes that are not ELEMENT.value
-   def process(CCodePhrase c, MarkupBuilder b)
+   def process(CCodePhrase c, MarkupBuilder b, ArchetypeInternalRef from_ref)
    {
-      b.select(name:c.path()) {
+      def cpath = c.path()
+      if (from_ref) cpath = cpath.replace(from_ref.targetPath, from_ref.path()) // the parent of the current node is the ref not the referenced node
+         
+      b.select(name:cpath) {
                     
          c.codeList.each { code ->
         
@@ -167,17 +189,20 @@ class FormGeneratorArchetype {
          }
       }
    }
-   def process(CPrimitiveObject p, MarkupBuilder b)
+   def process(CPrimitiveObject p, MarkupBuilder b, ArchetypeInternalRef from_ref)
    {
       // TODO:
       // Don't support po yet
       println "This constraint is not supported yet: "+ p.class  // e.g. CDuration
    }
    
-   def process(ArchetypeInternalRef o, MarkupBuilder b)
+   def process(ArchetypeInternalRef o, MarkupBuilder b, ArchetypeInternalRef from_ref)
    {
       def node = this.arch.node( o.targetPath ) // process referenced node
-      process(node, b)
+      
+      //println "ref node: " + node.getClass()
+      
+      process(node, b, o) // the processed is the reference but needs to start with the current node path to avoid losin the reference to the current object
    }
    
    /*
