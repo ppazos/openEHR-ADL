@@ -11,7 +11,7 @@ import org.openehr.rm.support.identification.ArchetypeID
 
 import se.acode.openehr.parser.*
 
-import org.apache.log4j.Logger
+//import org.apache.log4j.Logger
 
 import groovy.transform.Synchronized
 
@@ -25,7 +25,10 @@ import org.openehr.am.archetype.constraintmodel.ArchetypeConstraint
  */
 class ArchetypeManager {
 
-   private Logger log = Logger.getLogger(getClass()) 
+   // Da problemas el logger al incluir el codigo en un proyecto grails:
+   //  Fatal error during compilation org.apache.tools.ant.BuildException:
+   //   java.lang.NoSuchMethodError: org.apache.log4j.Logger.isTraceEnabled()
+   //private Logger log = Logger.getLogger(getClass()) 
    
    // Ruta independiente del SO
    // http://code.google.com/p/open-ehr-gen-framework/issues/detail?id=54
@@ -85,7 +88,7 @@ class ArchetypeManager {
       // eachFile sin FileType recorre tambien directorios.
       root.eachFile(groovy.io.FileType.FILES) { f ->
 
-         log.debug("LOAD: [" + f.name + "]")
+         //log.debug("LOAD: [" + f.name + "]")
 
          // PARSEAR ARQUETIPO
          ADLParser parser = null
@@ -95,7 +98,9 @@ class ArchetypeManager {
          }
          catch (IOException e)
          {
-            log.debug("PROBLEMA AL CREAR EL PARSER: " + e.message)
+            //log.debug("PROBLEMA AL CREAR EL PARSER: " + e.message)
+            println e.message
+            return
          }
          
          Archetype archetype = null
@@ -107,12 +112,13 @@ class ArchetypeManager {
          catch (Exception e)
          {
             println e.message
+            return
          }
          // /PARSEAR ARQUETIPO
              
          if (archetype)
          {
-            log.debug("Cargado el arquetipo: " + f.name + " de " + root.path)
+            //log.debug("Cargado el arquetipo: " + f.name + " de " + root.path)
             cache[archetype.archetypeId.value] = archetype
             timestamps[archetype.archetypeId.value] = new Date()
          }
