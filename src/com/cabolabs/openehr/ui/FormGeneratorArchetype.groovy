@@ -26,10 +26,12 @@ class FormGeneratorArchetype {
           link(rel:"stylesheet", href:"style.css")
         }
         body() {
-          h1(arch.archetypeId.value)
-          form(method:'POST') {
-            input(type:'hidden', name:'archetypeId', value:arch.archetypeId.value)
-            process(arch.definition, builder, null)
+          div(class: "container") {
+            h1(arch.archetypeId.value)
+            form(method:'POST') {
+              input(type:'hidden', name:'archetypeId', value:arch.archetypeId.value)
+              process(arch.definition, builder, null)
+            }
           }
         }
       }
@@ -68,7 +70,7 @@ class FormGeneratorArchetype {
            switch (valueObj.rmTypeName)
            {
               case 'DV_TEXT':
-                 textarea(name:path, '')
+                 textarea(name:path, class:'form-control', '')
               break
               case 'DV_CODED_TEXT':
                  def constraint = valueObj.attributes.find{ it.rmAttributeName == 'defining_code' }.children[0]
@@ -76,9 +78,9 @@ class FormGeneratorArchetype {
                  {
                     //println constraint.codeList
                     def cpath = constraint.path()
-                    if (from_ref) cpath = cpath.replace(from_ref.targetPath, from_ref.path()) // the parent of the current node is the ref not the referenced node
+                    if (from_ref) cpath = cpath.replace(from_ref.targetPath, from_ref.path() +'['+ this.arch.node( from_ref.targetPath ).nodeId +']') // the parent of the current node is the ref not the referenced node
          
-                    select(name:cpath) {
+                    select(name:cpath, class:'form-control') {
                     
                        constraint.codeList.each { code ->
                        
@@ -88,14 +90,14 @@ class FormGeneratorArchetype {
                  }
                  if (constraint instanceof ConstraintRef)
                  {
-                    input(type:'text', name:cpath)
+                    input(type:'text', name:cpath, class:'form-control')
                     i(class:'search', '')
                  }
               break
               case 'DV_QUANTITY':
-                 input(type:'text', name:path+'/magnitude')
+                 input(type:'text', name:path+'/magnitude', class:'form-control')
                  
-                 select(name:path+'/units') {
+                 select(name:path+'/units', class:'form-control') {
                     
                     valueObj.list.units.each { u ->
                     
@@ -104,10 +106,10 @@ class FormGeneratorArchetype {
                  }
               break
               case 'DV_COUNT':
-                 input(type:'number', name:path)
+                 input(type:'number', name:path, class:'form-control')
               break
               case 'DV_ORDINAL':
-                 select(name:path) {
+                 select(name:path, class:'form-control') {
                     
                     valueObj.list.each { ord ->
                     
@@ -116,34 +118,34 @@ class FormGeneratorArchetype {
                  }
               break
               case 'DV_DATE':
-                 input(type:'date', name:path)
+                 input(type:'date', name:path, class:'form-control')
               break
               case 'DV_DATE_TIME':
-                 input(type:'datetime-local', name:path)
+                 input(type:'datetime-local', name:path, class:'form-control')
               break
               case 'DV_BOOLEAN':
                  input(type:'checkbox', name:path)
               break
               case 'DV_DURATION':
                  label('D') {
-                   input(type:'number', name:path+'/D', class:'small')
+                   input(type:'number', name:path+'/D', class:'small form-control')
                  }
                  label('H') {
-                   input(type:'number', name:path+'/H', class:'small')
+                   input(type:'number', name:path+'/H', class:'small form-control')
                  }
                  label('M') {
-                   input(type:'number', name:path+'/M', class:'small')
+                   input(type:'number', name:path+'/M', class:'small form-control')
                  }
                  label('S') {
-                   input(type:'number', name:path+'/S', class:'small')
+                   input(type:'number', name:path+'/S', class:'small form-control')
                  }
               break
               case 'DV_PROPORTION':
                  label('numerator') {
-                   input(type:'number', name:path+'/numerator', class:'small')
+                   input(type:'number', name:path+'/numerator', class:'small form-control')
                  }
                  label('denominator') {
-                   input(type:'number', name:path+'/denominator', class:'small')
+                   input(type:'number', name:path+'/denominator', class:'small form-control')
                  }
               break
               // TODO: DV_IDENTIFIER
@@ -179,9 +181,9 @@ class FormGeneratorArchetype {
    def process(CCodePhrase c, MarkupBuilder b, ArchetypeInternalRef from_ref)
    {
       def cpath = c.path()
-      if (from_ref) cpath = cpath.replace(from_ref.targetPath, from_ref.path()) // the parent of the current node is the ref not the referenced node
+      if (from_ref) cpath = cpath.replace(from_ref.targetPath, from_ref.path() +'['+ this.arch.node( from_ref.targetPath ).nodeId +']') // the parent of the current node is the ref not the referenced node
          
-      b.select(name:cpath) {
+      b.select(name:cpath, class:'form-control') {
                     
          c.codeList.each { code ->
         
@@ -193,7 +195,17 @@ class FormGeneratorArchetype {
    {
       // TODO:
       // Don't support po yet
-      println "This constraint is not supported yet: "+ p.class  // e.g. CDuration
+      /*
+      println p
+      org.openehr.am.archetype.constraintmodel.CPrimitiveObject@1c74445[
+      item=org.openehr.am.archetype.constraintmodel.primitive.CDuration@1530ff3[
+      value=<null>
+      interval=org.openehr.rm.support.basic.Interval@691263[lower=PT24H,lowerIncluded=true,upper=PT24H,upperIncluded=true]
+      assumedValue=<null>
+      pattern=<null>
+      defaultValue=<null>
+     */
+      println "This constraint is not supported yet: "+ p.class +" "+ p.path() +" "+ p.rmTypeName // e.g. CDuration
    }
    
    def process(ArchetypeInternalRef o, MarkupBuilder b, ArchetypeInternalRef from_ref)
