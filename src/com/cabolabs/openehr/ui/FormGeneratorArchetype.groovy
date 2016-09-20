@@ -95,7 +95,7 @@ class FormGeneratorArchetype {
                  }
               break
               case 'DV_QUANTITY':
-                 input(type:'text', name:path+'/magnitude', class:'form-control')
+                 input(type:'number', name:path+'/magnitude', class:'form-control')
                  
                  select(name:path+'/units', class:'form-control') {
                     
