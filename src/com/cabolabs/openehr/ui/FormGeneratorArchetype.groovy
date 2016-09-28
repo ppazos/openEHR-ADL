@@ -43,6 +43,8 @@ class FormGeneratorArchetype {
    {
       // TODO:
       // For instruction, generate the narrative
+      // For action, generate time
+      // For history, generate origin
       // ...
       
       if (o.rmTypeName == 'ELEMENT')
@@ -57,7 +59,6 @@ class FormGeneratorArchetype {
             //println "current path " + path
             //println "from target: " + from_ref.targetPath
             //println "from path: " + from_ref.path()
-            
             // Need to add the nodeId of the target because the ref path doesn't have it
             path = path.replace(from_ref.targetPath, from_ref.path() +'['+ this.arch.node( from_ref.targetPath ).nodeId +']') // the parent of the current node is the ref not the referenced node
             //println "result path "+ path
@@ -74,17 +75,21 @@ class FormGeneratorArchetype {
               break
               case 'DV_CODED_TEXT':
                  def constraint = valueObj.attributes.find{ it.rmAttributeName == 'defining_code' }.children[0]
+                 def cpath = constraint.path()
+                 
                  if (constraint instanceof CCodePhrase)
                  {
-                    //println constraint.codeList
-                    def cpath = constraint.path()
                     if (from_ref) cpath = cpath.replace(from_ref.targetPath, from_ref.path() +'['+ this.arch.node( from_ref.targetPath ).nodeId +']') // the parent of the current node is the ref not the referenced node
          
-                    select(name:cpath, class:'form-control') {
+                    if (!constraint.codeList) println "No constraints for "+ path
+                    else
+                    {
+                       select(name:cpath, class:'form-control') {
                     
-                       constraint.codeList.each { code ->
-                       
-                          option(value:code, this.arch.ontology.termDefinition(locale, code)?.text)
+                          constraint?.codeList?.each { code ->
+                          
+                             option(value:code, this.arch.ontology.termDefinition(locale, code)?.text)
+                          }
                        }
                     }
                  }
@@ -97,11 +102,15 @@ class FormGeneratorArchetype {
               case 'DV_QUANTITY':
                  input(type:'number', name:path+'/magnitude', class:'form-control')
                  
-                 select(name:path+'/units', class:'form-control') {
-                    
-                    valueObj.list.units.each { u ->
-                    
-                       option(value:u, u)
+                 if (!valueObj.list) println "No constraints for "+ path
+                 else
+                 {
+                    select(name:path+'/units', class:'form-control') {
+                       
+                       valueObj?.list?.units?.each { u ->
+                       
+                          option(value:u, u)
+                       }
                     }
                  }
               break
@@ -109,11 +118,16 @@ class FormGeneratorArchetype {
                  input(type:'number', name:path, class:'form-control')
               break
               case 'DV_ORDINAL':
-                 select(name:path, class:'form-control') {
-                    
-                    valueObj.list.each { ord ->
-                    
-                       option(value:ord.value, this.arch.ontology.termDefinition(locale, ord.symbol.codeString).text)
+              
+                 if (!valueObj.list) println "No constraints for "+ path
+                 else
+                 {
+                    select(name:path, class:'form-control') {
+                       
+                       valueObj?.list?.each { ord ->
+                       
+                          option(value:ord.value, this.arch.ontology.termDefinition(locale, ord.symbol.codeString).text)
+                       }
                     }
                  }
               break
@@ -148,7 +162,24 @@ class FormGeneratorArchetype {
                    input(type:'number', name:path+'/denominator', class:'small form-control')
                  }
               break
-              // TODO: DV_IDENTIFIER
+              case 'DV_IDENTIFIER':
+                 label('issuer') {
+                   input(type:'text', name:path+'/issuer', class:'small form-control')
+                 }
+                 label('assigner') {
+                   input(type:'text', name:path+'/assigner', class:'small form-control')
+                 }
+                 label('id') {
+                   input(type:'text', name:path+'/id', class:'small form-control')
+                 }
+                 label('type') {
+                   input(type:'text', name:path+'/type', class:'small form-control')
+                 }
+              break
+              default:
+                 println "Type "+ valueObj.rmTypeName + " not supported yet"
+              
+              // TODO; DV_MULTIMEDIA
               // TODO: generar campos para los DV_INTERVAL
            }
          }

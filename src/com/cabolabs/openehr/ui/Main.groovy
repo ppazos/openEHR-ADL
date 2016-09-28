@@ -61,7 +61,7 @@ class Main {
       // Verify the archetype support the selected locale
       def locale = args[2]
       def translations = arch.translations // map<string, translationDetails>
-      def supportedLangs = translations.keySet() + [arch.originalLanguage.codeString]
+      def supportedLangs = (translations ? translations.keySet() : []) + [arch.originalLanguage.codeString]
       if (!supportedLangs.contains(locale))
       {
          println "The archetype doesn't support the language $locale, should be one of: "+ supportedLangs
