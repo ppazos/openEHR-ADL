@@ -176,10 +176,12 @@ class FormGeneratorArchetype {
                    input(type:'text', name:path+'/type', class:'small form-control')
                  }
               break
+              case 'DV_MULTIMEDIA':
+                 input(type:'checkbox', name:path)
+              break
               default:
                  println "Type "+ valueObj.rmTypeName + " not supported yet"
               
-              // TODO; DV_MULTIMEDIA
               // TODO: generar campos para los DV_INTERVAL
            }
          }
