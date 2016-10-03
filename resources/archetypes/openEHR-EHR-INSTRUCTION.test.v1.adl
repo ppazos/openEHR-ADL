@@ -1,0 +1,78 @@
+archetype (adl_version=1.4)
+	openEHR-EHR-INSTRUCTION.test.v1
+
+concept
+	[at0000]	-- Test
+language
+	original_language = <[ISO_639-1::es]>
+description
+	original_author = <
+		["name"] = <"">
+	>
+	details = <
+		["es"] = <
+			language = <[ISO_639-1::es]>
+			purpose = <"">
+			use = <"">
+			misuse = <"">
+			copyright = <"">
+		>
+	>
+	lifecycle_state = <"0">
+	other_contributors = <>
+	other_details = <
+		["MD5-CAM-1.0.1"] = <"9E1D9C9031D59C6AA031953D1ED2BA85">
+	>
+
+definition
+	INSTRUCTION[at0000] matches {	-- Test
+		activities cardinality matches {0..*; unordered} matches {
+			ACTIVITY[at0001] occurrences matches {0..1} matches {	-- Current Activity
+				description matches {
+					ITEM_TREE[at0002] matches {	-- Arbol
+						items cardinality matches {0..*; unordered} matches {
+							ELEMENT[at0003] occurrences matches {0..1} matches {	-- Nuevo elemento
+								value matches {
+									DV_TEXT matches {*}
+								}
+							}
+							ELEMENT[at0004] occurrences matches {0..1} matches {	-- Nuevo elemento
+								value matches {
+									C_DV_QUANTITY <
+									>
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+ontology
+	term_definitions = <
+		["es"] = <
+			items = <
+				["at0000"] = <
+					text = <"Test">
+					description = <"unknown">
+				>
+				["at0001"] = <
+					text = <"Current Activity">
+					description = <"Current Activity">
+				>
+				["at0002"] = <
+					text = <"Arbol">
+					description = <"@ internal @">
+				>
+				["at0003"] = <
+					text = <"Nuevo elemento">
+					description = <"*">
+				>
+				["at0004"] = <
+					text = <"Nuevo elemento">
+					description = <"*">
+				>
+			>
+		>
+	>

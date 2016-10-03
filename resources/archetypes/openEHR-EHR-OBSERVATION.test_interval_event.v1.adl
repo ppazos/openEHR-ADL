@@ -1,0 +1,73 @@
+archetype (adl_version=1.4)
+	openEHR-EHR-OBSERVATION.test_interval_event.v1
+
+concept
+	[at0000]	-- Test interval event
+language
+	original_language = <[ISO_639-1::es]>
+description
+	original_author = <
+		["name"] = <"">
+	>
+	details = <
+		["es"] = <
+			language = <[ISO_639-1::es]>
+			purpose = <"Test interval event">
+			use = <"Test interval event">
+			misuse = <"">
+			copyright = <"">
+		>
+	>
+	lifecycle_state = <"0">
+	other_contributors = <>
+	other_details = <
+		["MD5-CAM-1.0.1"] = <"4FD4CF60CD2A689EBCE60E6BBD8609FC">
+	>
+
+definition
+	OBSERVATION[at0000] matches {	-- Test interval event
+		data matches {
+			HISTORY[at0001] matches {	-- Event Series
+				events cardinality matches {1..*; unordered} matches {
+					INTERVAL_EVENT[at0002] occurrences matches {0..1} matches {	-- Cualquier evento
+						math_function matches {
+							DV_CODED_TEXT matches {
+								defining_code matches {
+									[openehr::
+									144, 
+									145]
+								}
+							}
+						}
+						data matches {
+							ITEM_TREE[at0003] matches {*}
+						}
+					}
+				}
+			}
+		}
+	}
+
+ontology
+	term_definitions = <
+		["es"] = <
+			items = <
+				["at0000"] = <
+					text = <"Test interval event">
+					description = <"unknown">
+				>
+				["at0001"] = <
+					text = <"Event Series">
+					description = <"@ internal @">
+				>
+				["at0002"] = <
+					text = <"Cualquier evento">
+					description = <"*">
+				>
+				["at0003"] = <
+					text = <"Arbol">
+					description = <"@ internal @">
+				>
+			>
+		>
+	>
