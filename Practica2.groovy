@@ -6,20 +6,20 @@ def loader = ArchetypeManager.getInstance(path)
 // Carga todos los arquetipos de un directorio dado y los cachea
 loader.loadAll()
 
-// Acceso rápido a arquetipos en memoria
+// Acceso rï¿½pido a arquetipos en memoria
 def arch = loader.getArchetype("openEHR-EHR-OBSERVATION.blood_pressure.v1")
 
 // Acceso a nodos de arquetipos por rutas absolutas
 def c = loader.getArchetypeNode("openEHR-EHR-OBSERVATION.blood_pressure.v1"+
                                 "/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value")
 
-// Restricción sobre DV_QUANTITY de PA Sistólica!
+// Restricciï¿½n sobre DV_QUANTITY de PA Sistï¿½lica!
 assert c.getClass().getSimpleName() == "CDvQuantity"
 
-// Idem usando la interfaz de Archetype y ruta relativa a la raíz del arquetipo
+// Idem usando la interfaz de Archetype y ruta relativa a la raï¿½z del arquetipo
 c = arch.node("/data[at0001]/events[at0006]/data[at0003]/items[at0004]/value")
 
-/** Validación de datos contra restricción
+/** Validacion de datos contra restriccion
 https://github.com/openEHR/java-libs/blob/master/openehr-ap/src/main/java/org/openehr/am/
 openehrprofile/datatypes/quantity/CDvQuantity.java
 **/
