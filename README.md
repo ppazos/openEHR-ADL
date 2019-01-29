@@ -1,2 +1,2 @@
 # openEHR-ADL
-Project that centralizes all the ADL processing for CaboLabs projects
+Project that centralizes all the ADL (openEHR Archetype Definition Language) processing for CaboLabs projects.
