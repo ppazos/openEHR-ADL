@@ -88,8 +88,10 @@ class Main {
                   rows += "\n"
                }
 
-               out = new File(fpath + PS + archId +'.csv')
+               // https://gist.github.com/js1972/22d9c24a62776d8e85cc
+               out = new File(fpath + PS + archId +'.csv').newWriter() // with newWriter it overwrites the file, without it, it appends to the existing
                out << header + rows
+               out.close() // writer needs to be closed
             }
 
             println "Generated "+ loader.getLoadedArchetypes().size() +" CSV files"
