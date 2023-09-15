@@ -8,7 +8,7 @@ def loader = ArchetypeManager.getInstance(path)
 // Carga todos los arquetipos de un directorio dado y los cachea
 loader.loadAll()
 
-// Acceso rápido a arquetipos en memoria
+// Acceso rï¿½pido a arquetipos en memoria
 def arch = loader.getArchetype("openEHR-EHR-OBSERVATION.blood_pressure.v1")
 
 // ver http://www.openehr.org/releases/1.0.2/architecture/am/aom.pdf pagina 19
@@ -18,9 +18,9 @@ traverse(arch.definition)
 def traverse(CObject o)
 {
   println o.getClass().getSimpleName() +"\t"+ o.rmTypeName.padLeft(15) +"\t"+ o.path()
-  
-  /*
+
   println o.getClass()
+  /*
   org.openehr.am.openehrprofile.datatypes.text.CCodePhrase
   org.openehr.am.archetype.constraintmodel.ArchetypeSlot
   org.openehr.am.archetype.constraintmodel.ArchetypeInternalRef
